@@ -1,14 +1,20 @@
-import { Context } from '@netlify/functions'
+import type { Context } from "@netlify/functions";
+import * as fs from 'fs';
 
-export default (request: Request, context: Context) => {
+export default async (req: Request, context: Context) => {
+  const filePath = './pv.txt';
+  let pv = 0;
   try {
-    const url = new URL(request.url)
-    const subject = url.searchParams.get('name') || 'World'
-
-    return new Response(`Hello ${subject}`)
+    const data = await fs.promises.readFile(filePath, 'utf8');
+    pv = parseInt(data, 10);
   } catch (error) {
-    return new Response(error.toString(), {
-      status: 500,
-    })
+    if (error.code === 'ENOENT') {
+      // File does not exist, create it with initial value 0
+      await fs.promises.writeFile(filePath, '0');
+    } else {
+      console.error('Error reading PV file:', error);
+    }
   }
+  await fs.promises.writeFile(filePath, (pv + 1).toString());
+  return new Response(`pv: ${pv + 1}`);
 }
