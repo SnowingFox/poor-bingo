@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import 'uno.css'
 import '@unocss/reset/tailwind.css'
 
@@ -20,6 +20,10 @@ function App() {
     BINGO_DATA.map(content => ({ content, selected: false }))
   );
   const [hasWinningLine, setHasWinningLine] = useState(false);
+
+  useEffect(() => {
+    fetch('/.netlify/functions/test')
+  }, [])
 
   const checkWinningLines = (selectedCells: Cell[]) => {
     // 检查横向
